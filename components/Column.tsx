@@ -4,6 +4,7 @@ import TodoCard from "./TodoCard"
 import { PlusCircleIcon } from "@heroicons/react/24/solid"
 import { useBoardStore } from "@/store/BoardStore"
 import { matchTodosWithSearchQuery } from "@/utils"
+import { useModalStore } from "@/store/ModalStore"
 
 interface IProps {
   id: TypedColumn
@@ -20,7 +21,16 @@ const idToColumnText: {
 }
 
 const Column = ({ id, todos, index }: IProps) => {
-  const [query] = useBoardStore((state) => [state.query])
+  const [query, setTaskType] = useBoardStore((state) => [
+    state.query,
+    state.setTaskType,
+  ])
+  const [openModal] = useModalStore((state) => [state.openModal])
+
+  const onAddTask = () => {
+    setTaskType(id)
+    openModal()
+  }
 
   return (
     <Draggable draggableId={id} index={index}>
@@ -73,7 +83,10 @@ const Column = ({ id, todos, index }: IProps) => {
 
                   {provided.placeholder}
                   <div className="flex items-end justify-end p-2">
-                    <button className="text-green-500 hover:text-green-600">
+                    <button
+                      className="text-green-500 hover:text-green-600"
+                      onClick={onAddTask}
+                    >
                       <PlusCircleIcon className="h-10 w-10" />
                     </button>
                   </div>

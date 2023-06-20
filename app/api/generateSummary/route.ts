@@ -24,7 +24,5 @@ export async function POST(request: Request) {
   })
 
   const { data } = response
-  console.log(data)
-  console.log(data.choices[0].message)
   return NextResponse.json(data.choices[0].message)
 }

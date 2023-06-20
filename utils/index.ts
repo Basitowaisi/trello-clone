@@ -1,3 +1,6 @@
+import { storage, ID } from "@/appwrite"
+import { Models } from "appwrite"
+
 export const matchTodosWithSearchQuery = (todo: Todo, query: string) => {
   if (!query) return todo
 
@@ -20,4 +23,21 @@ export const formatTodosForOpenAI = (board: Board) => {
   )
 
   return flatArrayCounted
+}
+
+export const uploadImage = async (
+  image: File
+): Promise<Models.File | undefined> => {
+  if (!image) return
+  const file = await storage.createFile(
+    process.env.NEXT_PUBLIC_STORAGE_ID!,
+    ID.unique(),
+    image
+  )
+  return file
+}
+
+export const getImageURL = async (image: Image) => {
+  const url = storage.getFilePreview(image.bucketId, image.fileId)
+  return url
 }
