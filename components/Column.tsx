@@ -2,6 +2,8 @@ import React from "react"
 import { Draggable, Droppable } from "react-beautiful-dnd"
 import TodoCard from "./TodoCard"
 import { PlusCircleIcon } from "@heroicons/react/24/solid"
+import { useBoardStore } from "@/store/BoardStore"
+import { matchTodosWithSearchQuery } from "@/utils"
 
 interface IProps {
   id: TypedColumn
@@ -18,6 +20,8 @@ const idToColumnText: {
 }
 
 const Column = ({ id, todos, index }: IProps) => {
+  const [query] = useBoardStore((state) => [state.query])
+
   return (
     <Draggable draggableId={id} index={index}>
       {(provided) => (
@@ -38,28 +42,34 @@ const Column = ({ id, todos, index }: IProps) => {
                 <h1 className="flex justify-between font-bold text-xl">
                   {idToColumnText[id]}
                   <span className="text-gray-500 bg-gray-200 rounded-full px-2 py-1 text-sm font-bold">
-                    {todos.length}
+                    {
+                      todos.filter((todo) =>
+                        matchTodosWithSearchQuery(todo, query)
+                      ).length
+                    }
                   </span>
                 </h1>
                 <div className="space-y-2 mt-2">
-                  {todos.map((todo, index) => (
-                    <Draggable
-                      key={todo.$id}
-                      draggableId={todo.$id}
-                      index={index}
-                    >
-                      {(provided) => (
-                        <TodoCard
-                          todo={todo}
-                          index={index}
-                          id={id}
-                          innerRef={provided.innerRef}
-                          draggableProps={provided.draggableProps}
-                          dragHandleProps={provided.dragHandleProps}
-                        />
-                      )}
-                    </Draggable>
-                  ))}
+                  {todos
+                    .filter((todo) => matchTodosWithSearchQuery(todo, query))
+                    .map((todo, index) => (
+                      <Draggable
+                        key={todo.$id}
+                        draggableId={todo.$id}
+                        index={index}
+                      >
+                        {(provided) => (
+                          <TodoCard
+                            todo={todo}
+                            index={index}
+                            id={id}
+                            innerRef={provided.innerRef}
+                            draggableProps={provided.draggableProps}
+                            dragHandleProps={provided.dragHandleProps}
+                          />
+                        )}
+                      </Draggable>
+                    ))}
 
                   {provided.placeholder}
                   <div className="flex items-end justify-end p-2">
